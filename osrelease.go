@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-// FILE_PATHS contain all file paths which are supported by documentation
-var FILE_PATHS = []string{
-	"/etc/os-release",
-	"/usr/lib/os-release",
-}
+// etcPath is the default path to os-release in etc
+var etcPath = "/etc/os-release"
+
+// usrPath is the default path to os-release in usr
+var usrPath = "/usr/lib/os-release"
 
 // OSRelease implements the format noted at
 // https://www.freedesktop.org/software/systemd/man/os-release.html
@@ -78,11 +78,10 @@ func (o *OSRelease) GetField(key string) (string, error) {
 
 	if supported == true {
 		return reflect.ValueOf(*o).FieldByName(key).String(), nil
-	} else {
-		for additionalKey, _ := range o.ADDITIONAL_FIELDS {
-			if key == additionalKey {
-				return o.ADDITIONAL_FIELDS[additionalKey], nil
-			}
+	}
+	for additionalKey := range o.ADDITIONAL_FIELDS {
+		if key == additionalKey {
+			return o.ADDITIONAL_FIELDS[additionalKey], nil
 		}
 	}
 	// Fail case
@@ -91,14 +90,14 @@ func (o *OSRelease) GetField(key string) (string, error) {
 
 // Populate reads the os-release file, parses it, and
 // sets fields for use.
-func (o *OSRelease) Populate() error {
+func (o *OSRelease) Populate(paths []string) error {
 	o.supportedFields = o.getFields()
 	o.ADDITIONAL_FIELDS = make(map[string]string)
 
 	// Iterate over our known file paths
 	var rawContent []byte
 	var err error
-	for _, path := range FILE_PATHS {
+	for _, path := range paths {
 		rawContent, err = ioutil.ReadFile(path)
 		if err == nil {
 			break
@@ -125,8 +124,18 @@ func (o *OSRelease) Populate() error {
 // New creates and returns a new insance of OSRelease.
 // Generally New should be used to create a new instance.
 func New() (OSRelease, error) {
+	o, err := NewWithOverrides(etcPath, usrPath)
+	if err != nil {
+		return o, err
+	}
+	return o, nil
+}
+
+// NewWithOverrides creates and returns a new instance of OSRelease
+// using the paths passed in.
+func NewWithOverrides(etcOverridePath, usrOverridePath string) (OSRelease, error) {
 	o := OSRelease{}
-	err := o.Populate()
+	err := o.Populate([]string{etcOverridePath, usrOverridePath})
 	if err != nil {
 		return o, err
 	}
