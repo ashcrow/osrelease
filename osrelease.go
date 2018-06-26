@@ -50,8 +50,8 @@ func (o *OSRelease) getFields() []string {
 // added to ADDITIONAL_FIELDS.
 func (o *OSRelease) SetField(key, value string) {
 	supported := false
-	for _, supported_key := range o.supportedFields {
-		if key == supported_key {
+	for _, supportedKey := range o.supportedFields {
+		if key == supportedKey {
 			supported = true
 			break
 		}
@@ -68,8 +68,8 @@ func (o *OSRelease) SetField(key, value string) {
 // field is not present then an error us returned.
 func (o *OSRelease) GetField(key string) (string, error) {
 	supported := false
-	for _, supported_key := range o.supportedFields {
-		if key == supported_key {
+	for _, supportedKey := range o.supportedFields {
+		if key == supportedKey {
 			supported = true
 			break
 		}
@@ -95,20 +95,20 @@ func (o *OSRelease) Populate() error {
 	o.ADDITIONAL_FIELDS = make(map[string]string)
 
 	// Iterate over our known file paths
-	var raw_content []byte
+	var rawContent []byte
 	var err error
 	for _, path := range FILE_PATHS {
-		raw_content, err = ioutil.ReadFile(path)
+		rawContent, err = ioutil.ReadFile(path)
 		if err == nil {
 			break
 		}
 	}
 	// Error if we were unable to get any content
-	if len(raw_content) == 0 {
+	if len(rawContent) == 0 {
 		return errors.New("No content available from os-release files")
 	}
 
-	for _, line := range strings.Split(string(raw_content), "\n") {
+	for _, line := range strings.Split(string(rawContent), "\n") {
 		if strings.Contains(line, "=") {
 			item := strings.Split(string(line), "=")
 			// Remove prefix/suffix quotes from values
