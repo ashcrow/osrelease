@@ -1,4 +1,4 @@
-// osrelease package provides access to parsed os-release information
+// Package osrelease package provides access to parsed os-release information
 package osrelease
 
 import (
@@ -8,13 +8,14 @@ import (
 	"strings"
 )
 
-// All file paths which are supported by documentation
+// FILE_PATHS contain all file paths which are supported by documentation
 var FILE_PATHS = []string{
 	"/etc/os-release",
 	"/usr/lib/os-release",
 }
 
-// See https://www.freedesktop.org/software/systemd/man/os-release.html
+// OSRelease implements the format noted at
+// https://www.freedesktop.org/software/systemd/man/os-release.html
 type OSRelease struct {
 	NAME               string            // OS Identifier
 	VERSION            string            // Full OS Version
