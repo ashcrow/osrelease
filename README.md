@@ -59,9 +59,10 @@ import (
 )
 
 func RequireFedora() error {
-	// The OSRelease instance
-	or, err := osrelease.New()
-
+	// The OSRelease instance using the default paths
+	or, err := osrelease.New(nil)
+	// Or to inspect the files in /sysroot
+	//or, err := osrelease.NewWithOverrides("/sysroot/etc/osrelease", "/tmp/someplace/usr/lib/os-release"))
 	// Handle the error however you see fit
 	if err != nil {
 		return err
